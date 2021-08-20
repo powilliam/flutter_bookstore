@@ -2,7 +2,13 @@ import 'package:bs_app/src/screens/book.dart';
 import 'package:flutter/material.dart';
 
 class BookCard extends StatelessWidget {
-  const BookCard({Key? key}) : super(key: key);
+  final String title;
+  final String authors;
+  final String url;
+
+  const BookCard(
+      {Key? key, required this.title, required this.authors, required this.url})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,16 +31,15 @@ class BookCard extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Image.asset("images/fashinopolis_datathomas.png",
-                      width: 72, height: 106),
+                  Image.network(url, width: 72, height: 106),
                   const SizedBox(width: 16),
                   Expanded(
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                        Text('Yves Saint Laurent', style: _titleStyle),
+                        Text(title, style: _titleStyle),
                         const SizedBox(height: 4),
-                        Text('Suzy Menkes', style: _authorStyle)
+                        Text(authors, style: _authorStyle)
                       ])),
                 ],
               ))),

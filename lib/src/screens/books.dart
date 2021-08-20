@@ -1,9 +1,12 @@
+import 'package:bs_app/src/models/volume.dart';
 import 'package:bs_app/src/screens/book.dart';
 import 'package:bs_app/src/screens/bookmarks.dart';
 import 'package:bs_app/src/screens/shopping_cart.dart';
+import 'package:bs_app/src/viewmodels/books_viewmodel.dart';
 import 'package:bs_app/src/widgets/book_card.dart';
 import 'package:bs_app/src/widgets/counter_button.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Books extends StatelessWidget {
   static MaterialPageRoute route() =>
@@ -13,18 +16,30 @@ class Books extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: CustomScrollView(slivers: <Widget>[
-        _SliverAppBar(),
-        _BooksSectionTitle(
-          title: 'Popular',
-        ),
-        _PopularBooks(),
-        _BooksSectionTitle(
-          title: 'Newest',
-        ),
-        _NewestBooks()
-      ]),
+    return Scaffold(
+      body: Consumer<BooksViewModel>(builder: (_, booksViewModel, __) {
+        final BooksViewModelState _uiState = booksViewModel.uiState;
+        final bool shouldShowRelevant =
+            !_uiState.loading && _uiState.relevant.isNotEmpty;
+        final bool shouldShowNewest =
+            !_uiState.loading && _uiState.newest.isNotEmpty;
+
+        return CustomScrollView(slivers: <Widget>[
+          const _SliverAppBar(),
+          !shouldShowRelevant
+              ? const SliverToBoxAdapter()
+              : const _BooksSectionTitle(
+                  title: 'Relevant',
+                ),
+          _RelevantBooks(volumes: _uiState.relevant),
+          !shouldShowNewest
+              ? const SliverToBoxAdapter()
+              : const _BooksSectionTitle(
+                  title: 'Newest',
+                ),
+          _NewestBooks(volumes: _uiState.newest)
+        ]);
+      }),
     );
   }
 }
@@ -88,8 +103,10 @@ class _BooksSectionTitle extends StatelessWidget {
   }
 }
 
-class _PopularBooks extends StatelessWidget {
-  const _PopularBooks({Key? key}) : super(key: key);
+class _RelevantBooks extends StatelessWidget {
+  final List<Volume> volumes;
+
+  const _RelevantBooks({Key? key, required this.volumes}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -97,18 +114,19 @@ class _PopularBooks extends StatelessWidget {
       child: SingleChildScrollView(
         padding: const EdgeInsets.only(left: 8, right: 16, top: 16),
         scrollDirection: Axis.horizontal,
-        child: Row(children: const <Widget>[
-          _PopularBook(),
-          _PopularBook(),
-          _PopularBook(),
-        ]),
+        child: Row(
+            children: volumes
+                .map<Widget>((volume) => _RelevantBook(volume: volume))
+                .toList()),
       ),
     );
   }
 }
 
-class _PopularBook extends StatelessWidget {
-  const _PopularBook({Key? key}) : super(key: key);
+class _RelevantBook extends StatelessWidget {
+  final Volume volume;
+
+  const _RelevantBook({Key? key, required this.volume}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -119,6 +137,9 @@ class _PopularBook extends StatelessWidget {
         ?.copyWith(fontWeight: FontWeight.bold);
     final TextStyle? _descriptionStyle =
         Theme.of(context).textTheme.bodyText2?.copyWith(color: Colors.grey);
+
+    final String _authors =
+        (volume.info?.authors ?? []).map<String>((author) => author).join(', ');
 
     return Card(
       elevation: 0,
@@ -132,32 +153,41 @@ class _PopularBook extends StatelessWidget {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Image.asset("images/chanel_catwalk.png",
+                    Image.network(volume.info?.links?.thumbnail ?? "",
                         width: 131, height: 192),
                     const SizedBox(height: 20),
-                    Text('Chanel', style: _titleStyle),
+                    SizedBox(
+                      width: 131,
+                      child: Text(volume.info?.title ?? "",
+                          style: _titleStyle, overflow: TextOverflow.ellipsis),
+                    ),
                     const SizedBox(height: 4),
-                    Text('Patrick Mauriès', style: _descriptionStyle)
+                    SizedBox(
+                      width: 131,
+                      child: Text(_authors,
+                          style: _descriptionStyle,
+                          overflow: TextOverflow.ellipsis),
+                    )
                   ]))),
     );
   }
 }
 
 class _NewestBooks extends StatelessWidget {
-  const _NewestBooks({Key? key}) : super(key: key);
+  final List<Volume> volumes;
+
+  const _NewestBooks({Key? key, required this.volumes}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return SliverList(
-        delegate: SliverChildListDelegate(const <Widget>[
-      BookCard(),
-      BookCard(),
-      BookCard(),
-      BookCard(),
-      BookCard(),
-      BookCard(),
-      BookCard(),
-      BookCard(),
-    ]));
+        delegate: SliverChildBuilderDelegate(
+            (_, int index) => BookCard(
+                title: volumes[index].info?.title ?? "",
+                authors: (volumes[index].info?.authors ?? [])
+                    .map<String>((author) => author)
+                    .join(', '),
+                url: volumes[index].info?.links?.thumbnail ?? ""),
+            childCount: volumes.length));
   }
 }

@@ -51,14 +51,6 @@ class _BookmarksList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverList(
-        delegate: SliverChildListDelegate(const <Widget>[
-      BookCard(),
-      BookCard(),
-      BookCard(),
-      BookCard(),
-      BookCard(),
-      BookCard()
-    ]));
+    return SliverList(delegate: SliverChildListDelegate(const <Widget>[]));
   }
 }
