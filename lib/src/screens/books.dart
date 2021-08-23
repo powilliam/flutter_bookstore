@@ -5,6 +5,7 @@ import 'package:bs_app/src/screens/shopping_cart.dart';
 import 'package:bs_app/src/viewmodels/books_viewmodel.dart';
 import 'package:bs_app/src/widgets/book_card.dart';
 import 'package:bs_app/src/widgets/counter_button.dart';
+import 'package:bs_app/src/utils/formatters.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -138,15 +139,12 @@ class _RelevantBook extends StatelessWidget {
     final TextStyle? _descriptionStyle =
         Theme.of(context).textTheme.bodyText2?.copyWith(color: Colors.grey);
 
-    final String _authors =
-        (volume.info?.authors ?? []).map<String>((author) => author).join(', ');
-
     return Card(
       elevation: 0,
       color: _cardColor,
       child: InkWell(
           onTap: () {
-            Navigator.of(context).push(Book.route());
+            Navigator.of(context).push(Book.route(volume));
           },
           child: Container(
               padding: const EdgeInsets.all(8),
@@ -164,7 +162,7 @@ class _RelevantBook extends StatelessWidget {
                     const SizedBox(height: 4),
                     SizedBox(
                       width: 131,
-                      child: Text(_authors,
+                      child: Text(volume.info?.authors?.names() ?? "",
                           style: _descriptionStyle,
                           overflow: TextOverflow.ellipsis),
                     )
@@ -184,10 +182,11 @@ class _NewestBooks extends StatelessWidget {
         delegate: SliverChildBuilderDelegate(
             (_, int index) => BookCard(
                 title: volumes[index].info?.title ?? "",
-                authors: (volumes[index].info?.authors ?? [])
-                    .map<String>((author) => author)
-                    .join(', '),
-                url: volumes[index].info?.links?.thumbnail ?? ""),
+                authors: volumes[index].info?.authors?.names() ?? "",
+                url: volumes[index].info?.links?.thumbnail ?? "",
+                onTap: () {
+                  Navigator.of(context).push(Book.route(volumes[index]));
+                }),
             childCount: volumes.length));
   }
 }

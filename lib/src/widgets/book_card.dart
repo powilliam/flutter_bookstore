@@ -1,13 +1,17 @@
-import 'package:bs_app/src/screens/book.dart';
 import 'package:flutter/material.dart';
 
 class BookCard extends StatelessWidget {
   final String title;
   final String authors;
   final String url;
+  final void Function()? onTap;
 
   const BookCard(
-      {Key? key, required this.title, required this.authors, required this.url})
+      {Key? key,
+      required this.title,
+      required this.authors,
+      required this.url,
+      this.onTap})
       : super(key: key);
 
   @override
@@ -23,9 +27,7 @@ class BookCard extends StatelessWidget {
       color: Theme.of(context).scaffoldBackgroundColor,
       elevation: 0,
       child: InkWell(
-          onTap: () {
-            Navigator.of(context).push(Book.route());
-          },
+          onTap: onTap,
           child: Container(
               padding: const EdgeInsets.all(16),
               child: Row(

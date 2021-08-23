@@ -1,10 +1,14 @@
+import 'package:bs_app/src/models/volume.dart';
+import 'package:bs_app/src/utils/formatters.dart';
 import 'package:flutter/material.dart';
 
 class Book extends StatelessWidget {
-  static MaterialPageRoute route() =>
-      MaterialPageRoute(builder: (_) => const Book());
+  static MaterialPageRoute route(final Volume volume) =>
+      MaterialPageRoute(builder: (_) => Book(volume: volume));
 
-  const Book({Key? key}) : super(key: key);
+  final Volume volume;
+
+  const Book({Key? key, required this.volume}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -12,11 +16,18 @@ class Book extends StatelessWidget {
       persistentFooterButtons: <Widget>[
         ElevatedButton(
           onPressed: () {},
-          child: const Text('Buy now for \$46.99'),
+          child: Text("Buy now for \$${volume.sale?.price?.amount ?? "free"}"),
         )
       ],
-      body: const CustomScrollView(
-          slivers: <Widget>[_SliverAppBar(), _Details()]),
+      body: CustomScrollView(slivers: <Widget>[
+        const _SliverAppBar(),
+        _Details(
+          title: volume.info?.title ?? "",
+          description: volume.info?.description ?? "",
+          url: volume.info?.links?.thumbnail ?? "",
+          authors: volume.info?.authors?.names() ?? "",
+        )
+      ]),
     );
   }
 }
@@ -47,7 +58,18 @@ class _SliverAppBar extends StatelessWidget {
 }
 
 class _Details extends StatelessWidget {
-  const _Details({Key? key}) : super(key: key);
+  final String title;
+  final String authors;
+  final String description;
+  final String url;
+
+  const _Details(
+      {Key? key,
+      required this.title,
+      required this.authors,
+      required this.description,
+      required this.url})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -62,21 +84,23 @@ class _Details extends StatelessWidget {
 
     return SliverList(
         delegate: SliverChildListDelegate(<Widget>[
-      Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-        Image.asset("images/chanel_catwalk.png",
-            width: 212, height: 310, fit: BoxFit.cover),
-        const SizedBox(height: 32),
-        Text('Yves Saint Laurent', style: _titleStyle),
-        const SizedBox(height: 8),
-        Text('Suzy Menkes', style: _authorStyle),
-        const SizedBox(height: 16),
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Text(
-              'A spectacular visual journey through 40 years of haute couture from one of the best-known and most trend-setting brands in fashion.',
-              style: _contentStyle),
-        ),
-      ])
+      Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Image.network(url, width: 212, height: 310, fit: BoxFit.cover),
+              const SizedBox(height: 32),
+              Text(title, style: _titleStyle, textAlign: TextAlign.center),
+              const SizedBox(height: 8),
+              Text(authors, style: _authorStyle, textAlign: TextAlign.center),
+              const SizedBox(height: 16),
+              Text(description,
+                  style: _contentStyle,
+                  textAlign: TextAlign.justify,
+                  maxLines: 12),
+            ]),
+      )
     ]));
   }
 }
