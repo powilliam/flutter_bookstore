@@ -1,6 +1,8 @@
 import 'package:bs_app/src/models/volume.dart';
 import 'package:bs_app/src/utils/formatters.dart';
+import 'package:bs_app/src/viewmodels/shoppingcart_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Book extends StatelessWidget {
   static MaterialPageRoute route(final Volume volume) =>
@@ -14,10 +16,15 @@ class Book extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       persistentFooterButtons: <Widget>[
-        ElevatedButton(
-          onPressed: () {},
-          child: Text("Buy now for \$${volume.sale?.price?.amount ?? "free"}"),
-        )
+        Consumer<ShoppingCartViewModel>(
+            builder: (_, shoppingCartViewModel, widget) => ElevatedButton(
+                  onPressed: () {
+                    shoppingCartViewModel.insertOrRemove(volume);
+                  },
+                  child: Text(shoppingCartViewModel.volumes.contains(volume)
+                      ? "Remove from cart"
+                      : "Buy now for \$${volume.sale?.price?.amount ?? "free"}"),
+                ))
       ],
       body: CustomScrollView(slivers: <Widget>[
         const _SliverAppBar(),

@@ -3,6 +3,7 @@ import 'package:bs_app/src/screens/book.dart';
 import 'package:bs_app/src/screens/bookmarks.dart';
 import 'package:bs_app/src/screens/shopping_cart.dart';
 import 'package:bs_app/src/viewmodels/books_viewmodel.dart';
+import 'package:bs_app/src/viewmodels/shoppingcart_viewmodel.dart';
 import 'package:bs_app/src/widgets/book_card.dart';
 import 'package:bs_app/src/widgets/counter_button.dart';
 import 'package:bs_app/src/utils/formatters.dart';
@@ -68,13 +69,14 @@ class _SliverAppBar extends StatelessWidget {
             onPressed: () {
               Navigator.of(context).push(Bookmarks.route());
             }),
-        LabeledButton(
-            label: 0,
-            icon: Icons.shopping_cart_outlined,
-            labelAlwaysVisible: true,
-            onPressed: () {
-              Navigator.of(context).push(ShoppingCart.route());
-            }),
+        Consumer<ShoppingCartViewModel>(
+            builder: (_, shoppingCartViewModel, widget) => LabeledButton(
+                label: shoppingCartViewModel.volumes.length,
+                icon: Icons.shopping_cart_outlined,
+                labelAlwaysVisible: true,
+                onPressed: () {
+                  Navigator.of(context).push(ShoppingCart.route());
+                })),
         PopupMenuButton(
             icon: const Icon(Icons.more_vert, color: Colors.black),
             itemBuilder: (_) => const [PopupMenuItem(child: Text('Refresh'))])

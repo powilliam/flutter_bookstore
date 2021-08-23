@@ -2,6 +2,7 @@ import 'package:bs_app/src/app.dart';
 import 'package:bs_app/src/repositories/books.dart';
 import 'package:bs_app/src/services/books_service.dart';
 import 'package:bs_app/src/viewmodels/books_viewmodel.dart';
+import 'package:bs_app/src/viewmodels/shoppingcart_viewmodel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +16,7 @@ void main() async {
 
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(
-        create: (_) => BooksViewModel(_repository)..search('sociology'))
+        create: (_) => BooksViewModel(_repository)..search('sociology')),
+    ChangeNotifierProvider(create: (_) => ShoppingCartViewModel())
   ], child: App()));
 }
