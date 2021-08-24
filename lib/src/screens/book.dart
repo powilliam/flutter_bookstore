@@ -1,5 +1,6 @@
 import 'package:bs_app/src/models/volume.dart';
 import 'package:bs_app/src/utils/formatters.dart';
+import 'package:bs_app/src/viewmodels/bookmarks_viewmodel.dart';
 import 'package:bs_app/src/viewmodels/shoppingcart_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,7 +28,7 @@ class Book extends StatelessWidget {
                 ))
       ],
       body: CustomScrollView(slivers: <Widget>[
-        const _SliverAppBar(),
+        _SliverAppBar(volume: volume),
         _Details(
           title: volume.info?.title ?? "",
           description: volume.info?.description ?? "",
@@ -40,7 +41,9 @@ class Book extends StatelessWidget {
 }
 
 class _SliverAppBar extends StatelessWidget {
-  const _SliverAppBar({Key? key}) : super(key: key);
+  final Volume volume;
+
+  const _SliverAppBar({Key? key, required this.volume}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -56,9 +59,16 @@ class _SliverAppBar extends StatelessWidget {
           },
           icon: const Icon(Icons.navigate_before, color: Colors.black)),
       actions: <Widget>[
-        IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.bookmark_border, color: Colors.black)),
+        Consumer<BookmarksViewModel>(
+            builder: (_, bookmarksViewModel, widget) => IconButton(
+                onPressed: () {
+                  bookmarksViewModel.insertOrRemove(volume);
+                },
+                icon: Icon(
+                    bookmarksViewModel.bookmarks.contains(volume)
+                        ? Icons.bookmark
+                        : Icons.bookmark_border,
+                    color: Colors.black))),
       ],
     );
   }

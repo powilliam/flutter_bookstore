@@ -2,6 +2,7 @@ import 'package:bs_app/src/models/volume.dart';
 import 'package:bs_app/src/screens/book.dart';
 import 'package:bs_app/src/screens/bookmarks.dart';
 import 'package:bs_app/src/screens/shopping_cart.dart';
+import 'package:bs_app/src/viewmodels/bookmarks_viewmodel.dart';
 import 'package:bs_app/src/viewmodels/books_viewmodel.dart';
 import 'package:bs_app/src/viewmodels/shoppingcart_viewmodel.dart';
 import 'package:bs_app/src/widgets/book_card.dart';
@@ -61,12 +62,13 @@ class _SliverAppBar extends StatelessWidget {
       backgroundColor: _backgroundColor,
       title: Text('Book Store', style: _textStyle),
       actions: <Widget>[
-        LabeledButton(
-            label: 0,
-            icon: Icons.bookmarks,
-            onPressed: () {
-              Navigator.of(context).push(Bookmarks.route());
-            }),
+        Consumer<BookmarksViewModel>(
+            builder: (_, bookmarksViewModel, widget) => LabeledButton(
+                label: bookmarksViewModel.bookmarks.length,
+                icon: Icons.bookmarks,
+                onPressed: () {
+                  Navigator.of(context).push(Bookmarks.route());
+                })),
         Consumer<ShoppingCartViewModel>(
             builder: (_, shoppingCartViewModel, widget) => LabeledButton(
                 label: shoppingCartViewModel.volumes.length,
