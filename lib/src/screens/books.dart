@@ -77,9 +77,6 @@ class _SliverAppBar extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(context).push(ShoppingCart.route());
                 })),
-        PopupMenuButton(
-            icon: const Icon(Icons.more_vert, color: Colors.black),
-            itemBuilder: (_) => const [PopupMenuItem(child: Text('Refresh'))])
       ],
     );
   }
