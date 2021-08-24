@@ -21,24 +21,22 @@ class Books extends StatelessWidget {
     return Scaffold(
       body: Consumer<BooksViewModel>(builder: (_, booksViewModel, __) {
         final BooksViewModelState _uiState = booksViewModel.uiState;
-        final bool shouldShowRelevant =
-            !_uiState.loading && _uiState.relevant.isNotEmpty;
-        final bool shouldShowNewest =
-            !_uiState.loading && _uiState.newest.isNotEmpty;
+        final bool _isLoading = _uiState.loading &&
+            [_uiState.relevant.isEmpty, _uiState.newest.isEmpty]
+                .any((isEmpty) => isEmpty);
 
         return CustomScrollView(slivers: <Widget>[
           const _SliverAppBar(),
-          !shouldShowRelevant
-              ? const SliverToBoxAdapter()
-              : const _BooksSectionTitle(
-                  title: 'Relevant',
-                ),
+          _LoadingIndicator(isLoading: _isLoading),
+          _BooksSectionTitle(
+            isLoading: _isLoading,
+            title: 'Relevant',
+          ),
           _RelevantBooks(volumes: _uiState.relevant),
-          !shouldShowNewest
-              ? const SliverToBoxAdapter()
-              : const _BooksSectionTitle(
-                  title: 'Newest',
-                ),
+          _BooksSectionTitle(
+            isLoading: _isLoading,
+            title: 'Newest',
+          ),
           _NewestBooks(volumes: _uiState.newest)
         ]);
       }),
@@ -85,10 +83,29 @@ class _SliverAppBar extends StatelessWidget {
   }
 }
 
+class _LoadingIndicator extends StatelessWidget {
+  final bool isLoading;
+
+  const _LoadingIndicator({Key? key, required this.isLoading})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return !isLoading
+        ? const SliverToBoxAdapter()
+        : SliverList(
+            delegate: SliverChildListDelegate(
+                const <Widget>[LinearProgressIndicator()]));
+  }
+}
+
 class _BooksSectionTitle extends StatelessWidget {
+  final bool isLoading;
   final String title;
 
-  const _BooksSectionTitle({Key? key, required this.title}) : super(key: key);
+  const _BooksSectionTitle(
+      {Key? key, required this.isLoading, required this.title})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -97,12 +114,14 @@ class _BooksSectionTitle extends StatelessWidget {
         .headline6
         ?.copyWith(fontWeight: FontWeight.bold);
 
-    return SliverList(
-        delegate: SliverChildListDelegate(<Widget>[
-      Padding(
-          padding: const EdgeInsets.only(top: 32, left: 16, right: 16),
-          child: Text(title, style: _titleStyle))
-    ]));
+    return isLoading
+        ? const SliverToBoxAdapter()
+        : SliverList(
+            delegate: SliverChildListDelegate(<Widget>[
+            Padding(
+                padding: const EdgeInsets.only(top: 32, left: 16, right: 16),
+                child: Text(title, style: _titleStyle))
+          ]));
   }
 }
 

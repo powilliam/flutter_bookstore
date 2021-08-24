@@ -1,7 +1,6 @@
 import 'package:bs_app/src/dto/volumes.dart';
 import 'package:bs_app/src/models/volume.dart';
 import 'package:bs_app/src/repositories/books.dart';
-import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 

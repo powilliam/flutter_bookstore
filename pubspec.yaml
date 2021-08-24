@@ -36,7 +36,6 @@ dependencies:
   retrofit: ^2.0.1
   flutter_dotenv: ^5.0.2
   equatable: ^2.0.3
-  shimmer: ^2.0.0
 
 dev_dependencies:
   build_runner: ^2.1.1
