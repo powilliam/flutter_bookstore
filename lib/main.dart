@@ -1,6 +1,5 @@
 import 'package:bs_app/src/app.dart';
-import 'package:bs_app/src/repositories/books.dart';
-import 'package:bs_app/src/services/books_service.dart';
+import 'package:bs_app/src/di/app_container.dart';
 import 'package:bs_app/src/viewmodels/books_viewmodel.dart';
 import 'package:bs_app/src/viewmodels/shoppingcart_viewmodel.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,12 +10,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
 
-  final BooksService _service = BooksService();
-  final BooksRepository _repository = BooksRepositoryImpl(_service);
-
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(
-        create: (_) => BooksViewModel(_repository)..search('sociology')),
+        create: (_) => BooksViewModel(AppContainer.provideBooksRepository())
+          ..search('sociology')),
     ChangeNotifierProvider(create: (_) => ShoppingCartViewModel())
   ], child: App()));
 }
